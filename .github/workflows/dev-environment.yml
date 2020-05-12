@@ -16,28 +16,12 @@ jobs:
         run: |
           npm install
           npm run build:dev
-      - name: set bucket name
-        uses: bomb-on/aws-ssm-to-env@master
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        with:
-          parameter_name: "/dev/bucketName"
-      - name: set cloudfront id
-        uses: bomb-on/aws-ssm-to-env@master
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        with:
-          parameter_name: "/dev/cloudfrontId"
       - name: upload assets
         uses: jakejarvis/s3-sync-action@master
         with:
           args: --acl public-read --follow-symlinks --delete
         env:
-          AWS_S3_BUCKET: ${AWS_SSM_/DEV/BUCKETNAME}
+          AWS_S3_BUCKET: ${{ secrets.DEV_S3_BUCKET_NAME }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -45,7 +29,7 @@ jobs:
       - name: invalidate cloudfront
         uses: chetan/invalidate-cloudfront-action@master
         env:
-          DISTRIBUTION: ${AWS_SSM_/DEV/CLOUDFRONTID}
+          DISTRIBUTION: ${{ secrets.DEV_CLOUDFRONT_ID }}
           PATHS: "/*"
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
