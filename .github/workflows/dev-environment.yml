@@ -1,6 +1,9 @@
 name: Dev Deploy
 
-on: push
+on:
+  push:
+    tags:
+      - dev.*
 
 jobs:
   build-deploy:
